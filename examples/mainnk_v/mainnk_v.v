@@ -73,7 +73,7 @@ fn (mut s AppState) live_main() {
 			C.nk_layout_row_dynamic(s.ctx, 22, 1)
 			C.nk_property_int(s.ctx, c'Compression:', 0, &s.property, 100, 10, 1)
 
-			t := time.now().unix
+			t := time.now().unix()
 			s.frames++
 			fps := 'Application average $s.fps FPS'
 			if t > s.last_time {
@@ -113,7 +113,7 @@ fn main() {
 		win: 0
 		ctx: 0
 	}
-	s.last_time = int(time.now().unix)
+	s.last_time = int(time.now().unix())
 
 	C.SDL_SetHint(C.SDL_HINT_VIDEO_HIGHDPI_DISABLED, c'0')
 	C.SDL_Init(C.SDL_INIT_VIDEO | C.SDL_INIT_TIMER | C.SDL_INIT_EVENTS)

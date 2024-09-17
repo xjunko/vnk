@@ -21,7 +21,7 @@ module vnk
 #include "nuklear_sdl_gl3.h"
 #include "vnk.h"
 
-#flag linux -lGL -lGLEW
+#flag linux -lGL -lGLEW -lm
 
 #flag windows -lopengl32 -lglew32
 
@@ -49,6 +49,7 @@ pub mut:
 }
 
 pub struct C.nk_rect {
+pub:
 	x f32
 	y f32
 	w f32
