@@ -13,39 +13,34 @@ import time
 
 // these kludges are workaround for "the following imports were never used"
 // until these annoyances are fixed
-const (
-	vnk_version = vnk.version
-	sdl_version = sdl.version
-	os_maxpath  = os.max_path_len
-)
+const vnk_version = vnk.version
+const sdl_version = sdl.version
+const os_maxpath = os.max_path_len
 
 type UnusedStbi = stbi.Image
 
-const (
-	zoom               = 3
-	font_height        = 10
-	spr_width          = 16
-	spr_height         = 12
-	window_width       = 400
-	window_height      = 400
-	debug_width        = 200
-	debug_height       = 100
-	max_vertex_memory  = 512 * 1024
-	max_element_memory = 128 * 1024
-	c_empty            = ` `
-	c_store            = `.`
-	c_stored           = `*`
-	c_crate            = `$`
-	c_player           = `@`
-	c_splayer          = `+`
-	c_wall             = `#`
-)
+const zoom = 3
+const font_height = 10
+const spr_width = 16
+const spr_height = 12
+const window_width = 400
+const window_height = 400
+const debug_width = 200
+const debug_height = 100
+const max_vertex_memory = 512 * 1024
+const max_element_memory = 128 * 1024
+const c_empty = ` `
+const c_store = `.`
+const c_stored = `*`
+const c_crate = `$`
+const c_player = `@`
+const c_splayer = `+`
+const c_wall = `#`
 
 struct State {
 mut:
-	hide_window bool = true
-	nkw_rect    C.nk_rect = C.nk_rect{(window_width - debug_width) / 2, (window_height - debug_height) /
-	2, debug_width, debug_height}
+	hide_window bool      = true
+	nkw_rect    C.nk_rect = C.nk_rect{(window_width - debug_width) / 2, (window_height - debug_height) / 2, debug_width, debug_height}
 	bg          C.nk_colorf
 	last_time   int
 	frames      int
@@ -55,24 +50,24 @@ mut:
 	win_width   int
 	win_height  int
 	// Images
-	pw          int = spr_width * zoom
-	ph          int = spr_height * zoom
-	i_atlas     int
-	i_empty     C.nk_image
-	i_store     C.nk_image
-	i_stored    C.nk_image
-	i_crate     C.nk_image
-	i_player    C.nk_image
-	i_splayer   C.nk_image
-	i_wall      C.nk_image
+	pw        int = spr_width * zoom
+	ph        int = spr_height * zoom
+	i_atlas   int
+	i_empty   C.nk_image
+	i_store   C.nk_image
+	i_stored  C.nk_image
+	i_crate   C.nk_image
+	i_player  C.nk_image
+	i_splayer C.nk_image
+	i_wall    C.nk_image
 	// Game state
-	w           int
-	h           int
-	px          int
-	py          int
-	moves       int
-	pushes      int
-	map         [][]rune
+	w      int
+	h      int
+	px     int
+	py     int
+	moves  int
+	pushes int
+	map    [][]rune
 }
 
 @[live]
@@ -87,7 +82,7 @@ fn (mut s State) live_main() {
 		for j, ar in s.map {
 			s.w = 0
 			for i, ch in ar {
-				mut img := voidptr(0)
+				mut img := unsafe { nil }
 				match ch {
 					c_player {
 						s.px = i
@@ -133,18 +128,17 @@ fn (mut s State) live_main() {
 		if stored == crates {
 			status = 'YOU WIN!'
 		}
-		C.nk_label(s.ctx, 'moves=$s.moves pushes=$s.pushes $status'.str, C.NK_TEXT_LEFT)
+		C.nk_label(s.ctx, 'moves=${s.moves} pushes=${s.pushes} ${status}'.str, C.NK_TEXT_LEFT)
 	}
 	C.nk_end(s.ctx)
 	if !s.hide_window {
-		if 1 == C.nk_begin(s.ctx, 'Debug [l]', s.nkw_rect, 0 | C.NK_WINDOW_BORDER | C.NK_WINDOW_MOVABLE |
-			C.NK_WINDOW_SCALABLE | C.NK_WINDOW_MINIMIZABLE | C.NK_WINDOW_TITLE) {
+		if 1 == C.nk_begin(s.ctx, 'Debug [l]', s.nkw_rect, 0 | C.NK_WINDOW_BORDER | C.NK_WINDOW_MOVABLE | C.NK_WINDOW_SCALABLE | C.NK_WINDOW_MINIMIZABLE | C.NK_WINDOW_TITLE) {
 			s.nkw_rect = C.nk_window_get_bounds(s.ctx)
 			C.nk_layout_row_dynamic(s.ctx, font_height, 1)
-			C.nk_label(s.ctx, '$s.fps FPS'.str, C.NK_TEXT_LEFT)
-			C.nk_label(s.ctx, 'w=$s.w h=$s.h'.str, C.NK_TEXT_LEFT)
-			C.nk_label(s.ctx, 'px=$s.px py=$s.py'.str, C.NK_TEXT_LEFT)
-			C.nk_label(s.ctx, 'stored=$stored crates=$crates'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, '${s.fps} FPS'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, 'w=${s.w} h=${s.h}'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, 'px=${s.px} py=${s.py}'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, 'stored=${stored} crates=${crates}'.str, C.NK_TEXT_LEFT)
 			s.frames++
 			t := time.now().unix
 			if t > s.last_time {
@@ -219,7 +213,7 @@ fn image_load(filename string) int {
 	tex := u32(0)
 	data := C.stbi_load(filename.str, &x, &y, &n, 0)
 	if isnil(data) {
-		panic('[SDL]: failed to load image: $filename')
+		panic('[SDL]: failed to load image: ${filename}')
 	}
 	C.glGenTextures(1, &tex)
 	C.glBindTexture(C.GL_TEXTURE_2D, tex)
@@ -250,8 +244,7 @@ fn main() {
 	C.SDL_SetHint(C.SDL_HINT_VIDEO_HIGHDPI_DISABLED, '0')
 	C.SDL_Init(C.SDL_INIT_VIDEO | C.SDL_INIT_TIMER | C.SDL_INIT_EVENTS)
 	s.win = C.SDL_CreateWindow('Live! V Nuklear+SDL2+OpenGL3 demo', C.SDL_WINDOWPOS_CENTERED,
-		C.SDL_WINDOWPOS_CENTERED, window_width, window_height, C.SDL_WINDOW_OPENGL | C.SDL_WINDOW_SHOWN |
-		C.SDL_WINDOW_ALLOW_HIGHDPI)
+		C.SDL_WINDOWPOS_CENTERED, window_width, window_height, C.SDL_WINDOW_OPENGL | C.SDL_WINDOW_SHOWN | C.SDL_WINDOW_ALLOW_HIGHDPI)
 	gl_context := C.SDL_GL_CreateContext(s.win)
 	C.SDL_GL_SetAttribute(C.SDL_GL_CONTEXT_FLAGS, C.SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG)
 	C.SDL_GL_SetAttribute(C.SDL_GL_CONTEXT_PROFILE_MASK, C.SDL_GL_CONTEXT_PROFILE_CORE)
@@ -268,7 +261,7 @@ fn main() {
 	}
 	s.ctx = C.nk_sdl_init(s.win)
 	{
-		atlas := voidptr(0)
+		atlas := unsafe { nil }
 		C.nk_sdl_font_stash_begin(&atlas)
 		C.nk_sdl_font_stash_end() // nk_style_load_all_cursors(ctx, atlas->cursors); // nk_style_set_font(ctx, &roboto->handle);
 	}

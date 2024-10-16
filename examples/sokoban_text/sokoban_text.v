@@ -10,34 +10,28 @@ import nsauzede.vnk
 import os
 import time
 
-const (
-	zoom               = 1
-	font_height        = 10
-	window_width       = 400
-	window_height      = 400
-	debug_width        = window_width
-	debug_height       = 160
-	max_vertex_memory  = 512 * 1024
-	max_element_memory = 128 * 1024
-)
+const zoom = 1
+const font_height = 10
+const window_width = 400
+const window_height = 400
+const debug_width = window_width
+const debug_height = 160
+const max_vertex_memory = 512 * 1024
+const max_element_memory = 128 * 1024
 
 // these kludges are workaround for "the following imports were never used"
 // until these annoyances are fixed
-const (
-	vnk_version = vnk.version
-	sdl_version = sdl.version
-	os_maxpath  = os.max_path_len
-)
+const vnk_version = vnk.version
+const sdl_version = sdl.version
+const os_maxpath = os.max_path_len
 
-const (
-	c_empty   = ` `
-	c_store   = `.`
-	c_stored  = `*`
-	c_crate   = `$`
-	c_player  = `@`
-	c_splayer = `+`
-	c_wall    = `#`
-)
+const c_empty = ` `
+const c_store = `.`
+const c_stored = `*`
+const c_crate = `$`
+const c_player = `@`
+const c_splayer = `+`
+const c_wall = `#`
 
 struct State {
 mut:
@@ -52,13 +46,13 @@ mut:
 	win_width   int
 	win_height  int
 	// Game state
-	w           int
-	h           int
-	px          int
-	py          int
-	moves       int
-	pushes      int
-	map         [][]rune
+	w      int
+	h      int
+	px     int
+	py     int
+	moves  int
+	pushes int
+	map    [][]rune
 }
 
 @[live]
@@ -104,18 +98,17 @@ fn (mut s State) live_main() {
 		if stored == crates {
 			status = 'YOU WIN!'
 		}
-		C.nk_label(s.ctx, 'moves=$s.moves pushes=$s.pushes $status'.str, C.NK_TEXT_LEFT)
+		C.nk_label(s.ctx, 'moves=${s.moves} pushes=${s.pushes} ${status}'.str, C.NK_TEXT_LEFT)
 	}
 	C.nk_end(s.ctx)
 	if !s.hide_window {
-		if 1 == C.nk_begin(s.ctx, 'Debug [l]', s.nkw_rect, 0 | C.NK_WINDOW_BORDER | C.NK_WINDOW_MOVABLE |
-			C.NK_WINDOW_SCALABLE | C.NK_WINDOW_MINIMIZABLE | C.NK_WINDOW_TITLE) {
+		if 1 == C.nk_begin(s.ctx, 'Debug [l]', s.nkw_rect, 0 | C.NK_WINDOW_BORDER | C.NK_WINDOW_MOVABLE | C.NK_WINDOW_SCALABLE | C.NK_WINDOW_MINIMIZABLE | C.NK_WINDOW_TITLE) {
 			s.nkw_rect = C.nk_window_get_bounds(s.ctx)
 			C.nk_layout_row_dynamic(s.ctx, font_height * zoom, 1)
-			C.nk_label(s.ctx, '$s.fps FPS'.str, C.NK_TEXT_LEFT)
-			C.nk_label(s.ctx, 'w=$s.w h=$s.h'.str, C.NK_TEXT_LEFT)
-			C.nk_label(s.ctx, 'px=$s.px py=$s.py'.str, C.NK_TEXT_LEFT)
-			C.nk_label(s.ctx, 'stored=$stored crates=$crates'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, '${s.fps} FPS'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, 'w=${s.w} h=${s.h}'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, 'px=${s.px} py=${s.py}'.str, C.NK_TEXT_LEFT)
+			C.nk_label(s.ctx, 'stored=${stored} crates=${crates}'.str, C.NK_TEXT_LEFT)
 			s.frames++
 			t := time.now().unix
 			if t > s.last_time {
@@ -199,8 +192,7 @@ fn main() {
 	C.SDL_SetHint(C.SDL_HINT_VIDEO_HIGHDPI_DISABLED, '0')
 	C.SDL_Init(C.SDL_INIT_VIDEO | C.SDL_INIT_TIMER | C.SDL_INIT_EVENTS)
 	s.win = C.SDL_CreateWindow('Live! V Nuklear+SDL2+OpenGL3 demo', C.SDL_WINDOWPOS_CENTERED,
-		C.SDL_WINDOWPOS_CENTERED, window_width, window_height, C.SDL_WINDOW_OPENGL | C.SDL_WINDOW_SHOWN |
-		C.SDL_WINDOW_ALLOW_HIGHDPI)
+		C.SDL_WINDOWPOS_CENTERED, window_width, window_height, C.SDL_WINDOW_OPENGL | C.SDL_WINDOW_SHOWN | C.SDL_WINDOW_ALLOW_HIGHDPI)
 	gl_context := C.SDL_GL_CreateContext(s.win)
 	C.SDL_GL_SetAttribute(C.SDL_GL_CONTEXT_FLAGS, C.SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG)
 	C.SDL_GL_SetAttribute(C.SDL_GL_CONTEXT_PROFILE_MASK, C.SDL_GL_CONTEXT_PROFILE_CORE)
@@ -218,7 +210,7 @@ fn main() {
 	s.ctx = C.nk_sdl_init(s.win) // Load Fonts: if none of these are loaded a default font will be used // Load Cursor: if you uncomment cursor loading please hide the cursor
 	{
 		// struct nk_font_atlas *atlas
-		atlas := voidptr(0)
+		atlas := unsafe { nil }
 		C.nk_sdl_font_stash_begin(&atlas)
 		/*
 		struct nk_font *droid = nk_font_atlas_add_from_file(atlas, "../../../extra_font/DroidSans.ttf", 14, 0);

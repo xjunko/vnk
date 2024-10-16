@@ -6,16 +6,14 @@
 module main
 
 import nsauzede.vsdl2 as sdl
-import nsauzede.vnk
+import vnk
 import os
 import time
 
-const (
-	window_width       = 400
-	window_height      = 400
-	max_vertex_memory  = 512 * 1024
-	max_element_memory = 128 * 1024
-)
+const window_width = 400
+const window_height = 400
+const max_vertex_memory = 512 * 1024
+const max_element_memory = 128 * 1024
 
 enum Op {
 	easy
@@ -40,11 +38,9 @@ mut:
 
 // these kludges are workaround for "the following imports were never used"
 // until these annoyances are fixed
-const (
-	vnk_version = vnk.version
-	sdl_version = sdl.version
-	os_maxpath  = os.max_path_len
-)
+const vnk_version = vnk.version
+const sdl_version = sdl.version
+const os_maxpath = os.max_path_len
 
 @[live]
 fn (mut s AppState) live_main() {
@@ -61,7 +57,7 @@ fn (mut s AppState) live_main() {
 				r := s.bg.r * 255
 				g := s.bg.g * 255
 				b := s.bg.b * 255
-				println('button pressed! mode=$mode compr=$s.property r=$r g=$g b=$b')
+				println('button pressed! mode=${mode} compr=${s.property} r=${r} g=${g} b=${b}')
 			}
 			C.nk_layout_row_dynamic(s.ctx, 30, 2)
 			if 1 == C.nk_option_label(s.ctx, c'easy', s.op == .easy) {
@@ -75,7 +71,7 @@ fn (mut s AppState) live_main() {
 
 			t := time.now().unix()
 			s.frames++
-			fps := 'Application average $s.fps FPS'
+			fps := 'Application average ${s.fps} FPS'
 			if t > s.last_time {
 				s.fps = s.frames
 				s.frames = 0
@@ -138,7 +134,7 @@ fn main() {
 	// Load Cursor: if you uncomment cursor loading please hide the cursor
 	{
 		// struct nk_font_atlas *atlas
-		atlas := voidptr(0)
+		atlas := unsafe { nil }
 		C.nk_sdl_font_stash_begin(&atlas)
 		// struct nk_font *droid = nk_font_atlas_add_from_file(atlas, "../../../extra_font/DroidSans.ttf", 14, 0);
 		// struct nk_font *roboto = nk_font_atlas_add_from_file(atlas, "../../../extra_font/Roboto-Regular.ttf", 16, 0);

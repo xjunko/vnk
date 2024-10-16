@@ -108,6 +108,4 @@ fn C.nk_popup_begin(nk_context voidptr, nk_popup_type int, charp &char, nk_flags
 fn C.nk_popup_end(nk_context voidptr)
 fn C.nk_font_atlas_add_from_file(atlas voidptr, file_path &char, height f32, config voidptr) voidptr
 
-pub const (
-	version = '0.1' // hack to avoid unused module warning in the main program
-)
+pub const version = '0.1' // hack to avoid unused module warning in the main program
