@@ -6,7 +6,7 @@
 module main
 
 import nsauzede.vsdl2 as sdl
-import vnk
+import nsauzede.vnk
 import os
 import time
 
